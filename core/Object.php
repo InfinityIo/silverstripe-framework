@@ -5,8 +5,8 @@
  * This class provides a number of pattern implementations, as well as methods and fixes to add extra psuedo-static
  * and method functionality to PHP.
  * 
- * See {@link Extension} on how to implement a custom multiple
- * inheritance for object instances based on PHP5 method call overloading.
+ * See {@link Extension} on how to implement a custom multiple inheritance for object instances based on PHP5 method
+ * call overloading.
  * 
  * @todo Create instance-specific removeExtension() which removes an extension from $extension_instances,
  * but not from static $extensions, and clears everything added through defineMethods(), mainly $extra_methods.
@@ -27,10 +27,10 @@ abstract class Object {
 	 * );
 	 * </code>
 	 * 
-	 * Use {@link Object::add_extension()} to add extensions without access to the class code,
-	 * e.g. to extend core classes.
-	 * 
-	 * Extensions are instanciated together with the object and stored in {@link $extension_instances}.
+	 * Use {@link Object::add_extension()} to add extensions without access to the class code, e.g. to extend core
+	 * classes.
+	 *
+	 * Extensions are instantiated together with the object and stored in {@link $extension_instances}.
 	 *
 	 * @var array $extensions
 	 * @config
@@ -46,40 +46,36 @@ abstract class Object {
 		$custom_classes = array(),
 		$strong_classes = array();
 	
-	/**#@-*/
-	
 	/**
-	 * @var string the class name
+	 * @var string The class name
 	 */
 	public $class;
 
 	/**
 	 * Get a configuration accessor for this class. Short hand for Config::inst()->get($this->class, .....).
-	 * @return Config_ForClass|null
+	 * @return Config_ForClass
 	 */
-	static public function config() {
+	public static function config() {
 		return Config::inst()->forClass(get_called_class());
 	}
 
 	/**
-	 * @var array all current extension instances.
+	 * @var array All current extension instances.
 	 */
 	protected $extension_instances = array();
 	
 	/**
-	 * List of callbacks to call prior to extensions having extend called on them,
-	 * each grouped by methodName.
+	 * List of callbacks to call prior to extensions having extend called on them, each grouped by methodName.
 	 *
-	 * @var array[callable]
+	 * @var callable[]
 	 */
 	protected $beforeExtendCallbacks = array();
 
 	/**
-	 * Allows user code to hook into Object::extend prior to control
-	 * being delegated to extensions. Each callback will be reset
-	 * once called.
-	 * 
-	 * @param string $method The name of the method to hook into
+	 * Allows user code to hook into Object::extend prior to control being delegated to extensions. Each callback will
+	 * be reset once called.
+	 *
+	 * @param string   $method   The name of the method to hook into
 	 * @param callable $callback The callback to execute
 	 */
 	protected function beforeExtending($method, $callback) {
@@ -90,19 +86,17 @@ abstract class Object {
 	}
 	
 	/**
-	 * List of callbacks to call after extensions having extend called on them,
-	 * each grouped by methodName.
+	 * List of callbacks to call after extensions having extend called on them, each grouped by methodName.
 	 *
-	 * @var array[callable]
+	 * @var callable[]
 	 */
 	protected $afterExtendCallbacks = array();
 
 	/**
-	 * Allows user code to hook into Object::extend after control
-	 * being delegated to extensions. Each callback will be reset
-	 * once called.
-	 * 
-	 * @param string $method The name of the method to hook into
+	 * Allows user code to hook into Object::extend after control being delegated to extensions. Each callback will be
+	 * reset once called.
+	 *
+	 * @param string   $method   The name of the method to hook into
 	 * @param callable $callback The callback to execute
 	 */
 	protected function afterExtending($method, $callback) {
@@ -113,20 +107,19 @@ abstract class Object {
 	}
 	
 	/**
-	 * An implementation of the factory method, allows you to create an instance of a class
+	 * A factory method allowing you to create an instance of the called class.
 	 *
-	 * This method first for strong class overloads (singletons & DB interaction), then custom class overloads. If an
-	 * overload is found, an instance of this is returned rather than the original class. To overload a class, use
-	 * {@link Object::useCustomClass()}
+	 * This method first searches for strong class overloads (singletons & DB interaction), then custom class overloads.
+	 * If an overload is found, an instance of this is returned rather than the original class. To overload a class, use
+	 * {@link Object::useCustomClass()}.
 	 *
-	 * This can be called in one of two ways - either calling via the class directly,
-	 * or calling on Object and passing the class name as the first parameter. The following
-	 * are equivalent:
+	 * This can be called in one of two ways - either calling via the class directly, or calling on Object and passing
+	 * the class name as the first parameter. The following are equivalent:
 	 *    $list = DataList::create('SiteTree');
-	 *	  $list = SiteTree::get();
+	 *    $list = SiteTree::get();
 	 *
-	 * @param string $class the class name
-	 * @param mixed $arguments,... arguments to pass to the constructor
+	 * @param string $class         the class name
+	 * @param mixed  $arguments,... arguments to pass to the constructor
 	 * @return static
 	 */
 	public static function create() {
@@ -145,31 +138,33 @@ abstract class Object {
 	private static $_cache_inst_args = array();
 	
 	/**
-	 * Create an object from a string representation.  It treats it as a PHP constructor without the
-	 * 'new' keyword.  It also manages to construct the object without the use of eval().
 	 * 
-	 * Construction itself is done with Object::create(), so that Object::useCustomClass() calls
-	 * are respected.
-	 * 
+	 * Create an object from a string representation. It treats it as a PHP constructor without the 'new' keyword. It
+	 * also manages to construct the object without the use of eval().
+	 *
+	 * Construction itself is done with Object::create(), so that Object::useCustomClass() calls are respected.
 	 * `Object::create_from_string("Versioned('Stage','Live')")` will return the result of
 	 * `Versioned::create('Stage', 'Live);`
 	 * 
-	 * It is designed for simple, clonable objects.  The first time this method is called for a given
-	 * string it is cached, and clones of that object are returned.
 	 * 
-	 * If you pass the $firstArg argument, this will be prepended to the constructor arguments. It's
-	 * impossible to pass null as the firstArg argument.
-	 * 
+	 * It is designed for simple, clonable objects. The first time this method is called for a given string it is
+	 * cached, and clones of that object are returned.
+	 *
+	 * If you pass the $firstArg argument, this will be prepended to the constructor arguments. It's impossible to pass
+	 * null as the firstArg argument.
 	 * `Object::create_from_string("Varchar(50)", "MyField")` will return the result of
-	 * `Vachar::create('MyField', '50');`
-	 * 
-	 * Arguments are always strings, although this is a quirk of the current implementation rather
-	 * than something that can be relied upon.
+	 * `Varchar::create('MyField', '50');`
+	 *
+	 * Arguments are always strings, although this is a quirk of the current implementation rather than something that
+	 * can be relied upon.
+	 *
+	 * @param string $classSpec A string-based representation of the new object
+	 * @param string $firstArg  An initial argument to prepend to the ones specified in $classSpec
+	 * @return Object
 	 */
 	public static function create_from_string($classSpec, $firstArg = null) {
 		if(!isset(self::$_cache_inst_args[$classSpec.$firstArg])) {
-			// an $extension value can contain parameters as a string,
-			// e.g. "Versioned('Stage','Live')"
+			// An $extension value can contain parameters as a string, e.g. "Versioned('Stage','Live')"
 			if(strpos($classSpec,'(') === false) {
 				if($firstArg === null) self::$_cache_inst_args[$classSpec.$firstArg] = Object::create($classSpec);
 				else self::$_cache_inst_args[$classSpec.$firstArg] = Object::create($classSpec, $firstArg);
@@ -188,8 +183,12 @@ abstract class Object {
 	}
 	
 	/**
-	 * Parses a class-spec, such as "Versioned('Stage','Live')", as passed to create_from_string().
-	 * Returns a 2-elemnent array, with classname and arguments
+	 * Parses a class-spec, such as "Versioned('Stage','Live')", as passed to create_from_string(). Returns a 2-element
+	 * array, with ClassName and arguments.
+	 *
+	 * @param string $classSpec
+	 * @return array
+	 * @throws Exception
 	 */
 	public static function parse_class_spec($classSpec) {
 		$tokens = token_get_all("<?php $classSpec");
@@ -275,10 +274,10 @@ abstract class Object {
 	
 	/**
 	 * Similar to {@link Object::create()}, except that classes are only overloaded if you set the $strong parameter to
-	 * TRUE when using {@link Object::useCustomClass()}
+	 * true when using {@link Object::useCustomClass()}.
 	 *
-	 * @param string $class the class name
-	 * @param mixed $arguments,... arguments to pass to the constructor
+	 * @param string $class         The class name
+	 * @param mixed  $arguments,... Arguments to pass to the constructor
 	 * @return static
 	 */
 	public static function strong_create() {
@@ -294,12 +293,12 @@ abstract class Object {
 	
 	/**
 	 * This class allows you to overload classes with other classes when they are constructed using the factory method
-	 * {@link Object::create()}
+	 * {@link Object::create()}.
 	 *
-	 * @param string $oldClass the class to replace
-	 * @param string $newClass the class to replace it with
-	 * @param bool $strong allows you to enforce a certain class replacement under all circumstances. This is used in
-	 *        singletons and DB interaction classes
+	 * @param string $oldClass The class to replace
+	 * @param string $newClass The class to replace it with
+	 * @param bool   $strong   Allows you to enforce a certain class replacement under all circumstances. This is used in
+	 *                         singletons and DB interaction classes
 	 */
 	public static function useCustomClass($oldClass, $newClass, $strong = false) {
 		if($strong) {
@@ -312,8 +311,8 @@ abstract class Object {
 	/**
 	 * If a class has been overloaded, get the class name it has been overloaded with - otherwise return the class name
 	 *
-	 * @param string $class the class to check
-	 * @return string the class that would be created if you called {@link Object::create()} with the class
+	 * @param string $class The class to check
+	 * @return string The class that would be created if you called {@link Object::create()} with the class
 	 */
 	public static function getCustomClass($class) {
 		if(isset(self::$strong_classes[$class]) && ClassInfo::exists(self::$strong_classes[$class])) {
@@ -329,12 +328,10 @@ abstract class Object {
 	 * Get the value of a static property of a class, even in that property is declared protected (but not private),
 	 * without any inheritance, merging or parent lookup if it doesn't exist on the given class.
 	 *
-	 * @static
-	 * @param $class - The class to get the static from
-	 * @param $name - The property to get from the class
-	 * @param null $default - The value to return if property doesn't exist on class
-	 * @return any - The value of the static property $name on class $class, or $default if that property is not
-	 *               defined
+	 * @param string $class   The class to get the static from
+	 * @param string $name    The property to get from the class
+	 * @param mixed  $default The value to return if property doesn't exist on class
+	 * @return mixed The value of the static property $name on class $class, or $default if that property is not defined
 	 */
 	public static function static_lookup($class, $name, $default = null) {
 		if (is_subclass_of($class, 'Object')) {
@@ -374,18 +371,19 @@ abstract class Object {
 	}
 
 	/**
-	 * Get a static variable, taking into account SS's inbuild static caches and pseudo-statics
+	 * Get a static variable, taking into account SilverStripe's inbuilt static caches and pseudo-statics.
 	 *
-	 * This method first checks for any extra values added by {@link Object::add_static_var()}, and attemps to traverse
+	 * This method first checks for any extra values added by {@link Object::add_static_var()}, and attempts to traverse
 	 * up the extra static var chain until it reaches the top, or it reaches a replacement static.
 	 *
 	 * If any extra values are discovered, they are then merged with the default PHP static values, or in some cases
 	 * completely replace the default PHP static when you set $replace = true, and do not define extra data on any
-	 * child classes
+	 * child classes.
 	 *
-	 * @param string $class
-	 * @param string $name the property name
-	 * @param bool $uncached if set to TRUE, force a regeneration of the static cache
+	 * @deprecated 3.1 Replaced by {@link Config#get}
+	 * @param string $class The class to get the static from
+	 * @param string $name The property name
+	 * @param bool $uncached If set to true, force a regeneration of the static cache
 	 * @return mixed
 	 */
 	public static function get_static($class, $name, $uncached = false) {
@@ -394,11 +392,12 @@ abstract class Object {
 	}
 
 	/**
-	 * Set a static variable
+	 * Set a static variable.
 	 *
-	 * @param string $class
-	 * @param string $name the property name to set
-	 * @param mixed $value
+	 * @deprecated 3.1 Replaced by {@link Config#update}
+	 * @param string $class The class to set the static on
+	 * @param string $name  The property name to set
+	 * @param mixed  $value
 	 */
 	public static function set_static($class, $name, $value) {
 		Deprecation::notice('3.1.0', 'Replaced by Config#update');
@@ -406,26 +405,29 @@ abstract class Object {
 	}
 
 	/**
-	 * Get an uninherited static variable - a variable that is explicity set in this class, and not in the parent class.
+	 * Get an un-inherited static variable a variable that is explicitly set in this class, and not in the parent class.
 	 *
-	 * @param string $class
-	 * @param string $name
+	 * @deprecated 3.1 Replaced by {@link Config#get}
+	 * @param string $class The class to get the static from
+	 * @param string $name The property name
 	 * @return mixed
 	 */
 	public static function uninherited_static($class, $name, $uncached = false) {
 		Deprecation::notice('3.1.0', 'Replaced by Config#get');
 		return Config::inst()->get($class, $name, Config::UNINHERITED);
 	}
-	
+
 	/**
 	 * Traverse down a class ancestry and attempt to merge all the uninherited static values for a particular static
-	 * into a single variable
+	 * into a single variable.
 	 *
-	 * @param string $class
-	 * @param string $name the static name
-	 * @param string $ceiling an optional parent class name to begin merging statics down from, rather than traversing
-	 *        the entire hierarchy
+	 * @deprecated 3.1 Replaced by {@link Config#get}
+	 * @param string      $class   The class to get the static from
+	 * @param string      $name    The property name
+	 * @param bool|string $ceiling An optional parent class name to begin merging statics down from, rather than
+	 *                             traversing the entire hierarchy
 	 * @return mixed
+	 * @throws Exception
 	 */
 	public static function combined_static($class, $name, $ceiling = false) {
 		if ($ceiling) throw new Exception('Ceiling argument to combined_static is no longer supported');
@@ -435,11 +437,12 @@ abstract class Object {
 	}
 	
 	/**
-	 * Merge in a set of additional static variables
+	 * Merge in a set of additional static variables.
 	 *
-	 * @param string $class
-	 * @param array $properties in a [property name] => [value] format
-	 * @param bool $replace replace existing static vars
+	 * @deprecated 3.1 Replaced by {@link Config#update}
+	 * @param string $class      The class to set the static on
+	 * @param array  $properties In a [property name] => [value] format
+	 * @param bool   $replace    Replace existing static vars
 	 */
 	public static function addStaticVars($class, $properties, $replace = false) {
 		Deprecation::notice('3.1.0', 'Replaced by Config#update');
@@ -451,16 +454,17 @@ abstract class Object {
 	 * and existing psuedo-statics. Uses PHP's array_merge_recursive() with if the $replace argument is FALSE.
 	 * 
 	 * Documentation from http://php.net/array_merge_recursive:
-	 * If the input arrays have the same string keys, then the values for these keys are merged together 
-	 * into an array, and this is done recursively, so that if one of the values is an array itself, 
+	 * If the input arrays have the same string keys, then the values for these keys are merged together
+	 * into an array, and this is done recursively, so that if one of the values is an array itself,
 	 * the function will merge it with a corresponding entry in another array too.
-	 * If, however, the arrays have the same numeric key, the later value will not overwrite the original value, 
-	 * but will be appended. 
+	 * If, however, the arrays have the same numeric key, the later value will not overwrite the original value,
+	 * but will be appended.
 	 *
-	 * @param string $class
-	 * @param string $name the static name
-	 * @param mixed $value
-	 * @param bool $replace completely replace existing static values
+	 * @deprecated 3.1 Replaced by {@link Config#remove} and {@link Config#update}
+	 * @param string $class   The class to add the static to
+	 * @param string $name    The property name
+	 * @param mixed  $value
+	 * @param bool   $replace Completely replace existing static values
 	 */
 	public static function add_static_var($class, $name, $value, $replace = false) {
 		Deprecation::notice('3.1.0', 'Replaced by Config#remove and Config#update');
@@ -470,13 +474,16 @@ abstract class Object {
 	}
 
 	/**
-	 * Return TRUE if a class has a specified extension.
-	 * This supports backwards-compatible format (static Object::has_extension($requiredExtension))
-	 * and new format ($object->has_extension($class, $requiredExtension))
-	 * @param string $classOrExtension if 1 argument supplied, the class name of the extension to
-	 *                                 check for; if 2 supplied, the class name to test
-	 * @param string $requiredExtension used only if 2 arguments supplied
-	 * @param boolean $strict if the extension has to match the required extension and not be a subclass
+	 * Return true if a class has a specified extension. This supports backwards-compatible format:
+	 *   (static Object::has_extension($requiredExtension))
+	 * and new format:
+	 *   ($object->has_extension($class, $requiredExtension))
+	 *
+	 * @param string  $classOrExtension  If 1 argument supplied, the class name of the extension to check for; if 2
+	 *                                   supplied, the class name to test
+	 * @param string  $requiredExtension Used only if 2 arguments supplied
+	 * @param boolean $strict            If the extension has to match the required extension and not be a subclass
+	 * @return bool
 	 */
 	public static function has_extension($classOrExtension, $requiredExtension = null, $strict = false) {
 		//BC support
@@ -505,20 +512,19 @@ abstract class Object {
 	/**
 	 * Add an extension to a specific class.
 	 *
-	 * The preferred method for adding extensions is through YAML config,
-	 * since it avoids autoloading the class, and is easier to override in
-	 * more specific configurations.
-	 * 
-	 * As an alternative, extensions can be added to a specific class
-	 * directly in the {@link Object::$extensions} array.
-	 * See {@link SiteTree::$extensions} for examples.
-	 * Keep in mind that the extension will only be applied to new
-	 * instances, not existing ones (including all instances created through {@link singleton()}).
+	 * The preferred method for adding extensions is through YAML config, since it avoids autoloading the class, and is
+	 * easier to override in more specific configurations. As an alternative, extensions can be added to a specific
+	 * class directly in the {@link Object::$extensions} array. See {@link SiteTree::$extensions} for examples.
+	 *
+	 * Keep in mind that extensions added via this method will only be applied to new instances, not existing ones
+	 * (including all instances created through {@link singleton()}).
 	 *
 	 * @see http://doc.silverstripe.org/framework/en/trunk/reference/dataextension
-	 * @param string $class Class that should be extended - has to be a subclass of {@link Object}
-	 * @param string $extension Subclass of {@link Extension} with optional parameters 
-	 *  as a string, e.g. "Versioned" or "Translatable('Param')"
+	 *
+	 * @param string $classOrExtension Class that should be extended - has to be a subclass of {@link Object}
+	 * @param string $extension Subclass of {@link Extension} with optional parameters as a string, e.g.
+	 *                          "Versioned" or "Translatable('Param')"
+	 * @return bool
 	 */
 	public static function add_extension($classOrExtension, $extension = null) {
 		if(func_num_args() > 1) {
@@ -542,7 +548,7 @@ abstract class Object {
 				$extensionClass), E_USER_ERROR);
 		}
 		
-		// unset some caches
+		// Unset some caches
 		$subclasses = ClassInfo::subclassesFor($class);
 		$subclasses[] = $class;
 
@@ -568,31 +574,28 @@ abstract class Object {
 	/**
 	 * Remove an extension from a class.
 	 *
-	 * Keep in mind that this won't revert any datamodel additions
-	 * of the extension at runtime, unless its used before the
-	 * schema building kicks in (in your _config.php).
-	 * Doesn't remove the extension from any {@link Object}
-	 * instances which are already created, but will have an
-	 * effect on new extensions.
-	 * Clears any previously created singletons through {@link singleton()}
-	 * to avoid side-effects from stale extension information.
+	 * Keep in mind that this won't revert any datamodel additions of the extension at runtime, unless its used before
+	 * the schema building kicks in (in your _config.php). Doesn't remove the extension from any {@link Object}
+	 * instances which are already created, but will have an effect on new extensions.
+	 *
+	 * Clears any previously created singletons through {@link singleton()} to avoid side-effects from stale extension
+	 * information.
 	 * 
 	 * @todo Add support for removing extensions with parameters
 	 *
-	 * @param string $extension Classname of an {@link Extension} subclass, without parameters
+	 * @param string $extension ClassName of an {@link Extension} subclass, without parameters
 	 */
 	public static function remove_extension($extension) {
 		$class = get_called_class();
 
 		Config::inst()->remove($class, 'extensions', Config::anything(), $extension);
 
-		// remove any instances of the extension with parameters
+		// Remove any instances of the extension with parameters
 		$config = Config::inst()->get($class, 'extensions');
 
 		if($config) {
 			foreach($config as $k => $v) {
-				// extensions with parameters will be stored in config as
-				// ExtensionName("Param").
+				// Extensions with parameters will be stored in config as ExtensionName("Param").
 				if(preg_match(sprintf("/^(%s)\(/", preg_quote($extension, '/')), $v)) {
 					Config::inst()->remove($class, 'extensions', Config::anything(), $v);
 				}
@@ -601,10 +604,10 @@ abstract class Object {
 
 		Config::inst()->extraConfigSourcesChanged($class);
 
-		// unset singletons to avoid side-effects
+		// Unset singletons to avoid side-effects
 		Injector::inst()->unregisterAllObjects();
 
-		// unset some caches
+		// Unset some caches
 		$subclasses = ClassInfo::subclassesFor($class);
 		$subclasses[] = $class;
 		if($subclasses) foreach($subclasses as $subclass) {
@@ -615,10 +618,10 @@ abstract class Object {
 	
 	/**
 	 * @param string $class
-	 * @param bool $includeArgumentString Include the argument string in the return array,
-	 *  FALSE would return array("Versioned"), TRUE returns array("Versioned('Stage','Live')").
-	 * @return array Numeric array of either {@link DataExtension} classnames,
-	 *  or eval'ed classname strings with constructor arguments.
+	 * @param bool   $includeArgumentString Include the argument string in the return array, false would return
+	 *                                      array("Versioned"), true returns array("Versioned('Stage','Live')").
+	 * @return array Numeric array of either {@link DataExtension} ClassNames, or eval'ed ClassName strings with
+	 *               constructor arguments.
 	 */
 	public static function get_extensions($class, $includeArgumentString = false) {
 		$extensions = Config::inst()->get($class, 'extensions');
@@ -633,9 +636,8 @@ abstract class Object {
 			return $extensionClassnames;
 		}
 	}
-	
-	// --------------------------------------------------------------------------------------------------------------
 
+	/** @var array Classes that are forbidden from having extensions added to them */
 	private static $unextendable_classes = array('Object', 'ViewableData', 'RequestHandler');
 
 	static public function get_extra_config_sources($class = null) {
@@ -697,15 +699,16 @@ abstract class Object {
 			self::$classes_constructed[$this->class] = true;
 		}
 	}
-	
+
 	/**
-	 * Attemps to locate and call a method dynamically added to a class at runtime if a default cannot be located
+	 * Attempts to locate and call a method dynamically added to a class at runtime if a default cannot be located.
 	 *
 	 * You can add extra methods to a class using {@link Extensions}, {@link Object::createMethod()} or
-	 * {@link Object::addWrapperMethod()}
+	 * {@link Object::addWrapperMethod()}.
 	 *
 	 * @param string $method
-	 * @param array $arguments
+	 * @param array  $arguments
+	 * @throws Exception
 	 * @return mixed
 	 */
 	public function __call($method, $arguments) {
@@ -764,13 +767,11 @@ abstract class Object {
 		}
 	}
 	
-	// --------------------------------------------------------------------------------------------------------------
-	
 	/**
-	 * Return TRUE if a method exists on this object
+	 * Returns true if a method exists on this object.
 	 *
 	 * This should be used rather than PHP's inbuild method_exists() as it takes into account methods added via
-	 * extensions
+	 * extensions.
 	 *
 	 * @param string $method
 	 * @return bool
@@ -780,9 +781,9 @@ abstract class Object {
 	}
 	
 	/**
-	 * Return the names of all the methods available on this object
+	 * Return the names of all the methods available on this object.
 	 *
-	 * @param bool $custom include methods added dynamically at runtime
+	 * @param bool $custom Include methods added dynamically at runtime
 	 * @return array
 	 */
 	public function allMethodNames($custom = false) {
@@ -798,9 +799,9 @@ abstract class Object {
 	}
 
 	/**
-	 * Adds any methods from {@link Extension} instances attached to this object.
-	 * All these methods can then be called directly on the instance (transparently
-	 * mapped through {@link __call()}), or called explicitly through {@link extend()}.
+	 * Adds any methods from {@link Extension} instances attached to this object. All these methods can then be called
+	 * directly on the instance (transparently mapped through {@link __call()}), or called explicitly through
+	 * {@link extend()}.
 	 * 
 	 * @uses addMethodsFrom()
 	 */
@@ -819,12 +820,12 @@ abstract class Object {
 			echo '</ul>';
 		}
 	}
-	
+
 	/**
 	 * Add all the methods from an object property (which is an {@link Extension}) to this object.
 	 *
-	 * @param string $property the property name
-	 * @param string|int $index an index to use if the property is an array
+	 * @param string     $property The property name
+	 * @param string|int $index    An index to use if the property is an array
 	 */
 	protected function addMethodsFrom($property, $index = null) {
 		$extension = ($index !== null) ? $this->{$property}[$index] : $this->$property;
@@ -865,10 +866,10 @@ abstract class Object {
 	
 	/**
 	 * Add a wrapper method - a method which points to another method with a different name. For example, Thumbnail(x)
-	 * can be wrapped to generateThumbnail(x)
+	 * can be wrapped to generateThumbnail(x).
 	 *
-	 * @param string $method the method name to wrap
-	 * @param string $wrap the method name to wrap to
+	 * @param string $method The method name to wrap
+	 * @param string $wrap The method name to wrap to
 	 */
 	protected function addWrapperMethod($method, $wrap) {
 		self::$extra_methods[$this->class][strtolower($method)] = array (
@@ -876,14 +877,14 @@ abstract class Object {
 			'method' => $method
 		);
 	}
-	
+
 	/**
-	 * Add an extra method using raw PHP code passed as a string
+	 * Add an extra method using raw PHP code passed as a string.
 	 *
-	 * @param string $method the method name
-	 * @param string $code the PHP code - arguments will be in an array called $args, while you can access this object
-	 *        by using $obj. Note that you cannot call protected methods, as the method is actually an external
-	 *        function
+	 * @param string $method The method name
+	 * @param string $code   The PHP code - arguments will be in an array called $args, while you can access this object
+	 *                       by using $obj. Note that you cannot call protected methods, as the method is actually an
+	 *                       external function.
 	 */
 	protected function createMethod($method, $code) {
 		self::$extra_methods[$this->class][strtolower($method)] = array (
@@ -891,9 +892,8 @@ abstract class Object {
 		);
 	}
 	
-	// --------------------------------------------------------------------------------------------------------------
-	
 	/**
+	 * @deprecated 3.1 Replaced by {@link Config#get}
 	 * @see Object::get_static()
 	 */
 	public function stat($name, $uncached = false) {
@@ -901,6 +901,7 @@ abstract class Object {
 	}
 	
 	/**
+	 * @deprecated 3.1 Replaced by {@link Config#update}
 	 * @see Object::set_static()
 	 */
 	public function set_stat($name, $value) {
@@ -908,19 +909,18 @@ abstract class Object {
 	}
 	
 	/**
+	 * @deprecated 3.1 Replaced by {@link Config#get}
 	 * @see Object::uninherited_static()
 	 */
 	public function uninherited($name) {
 		return Config::inst()->get(($this->class ? $this->class : get_class($this)), $name, Config::UNINHERITED);
 	}
 
-	// --------------------------------------------------------------------------------------------------------------
-	
 	/**
-	 * Return true if this object "exists" i.e. has a sensible value
+	 * Return true if this object "exists" i.e. has a sensible value.
 	 *
-	 * This method should be overriden in subclasses to provide more context about the classes state. For example, a
-	 * {@link DataObject} class could return false when it is deleted from the database
+	 * This method should be overridden in subclasses to provide more context about the classes state. For example, a
+	 * {@link DataObject} class could return false when it is does not exist in the database.
 	 *
 	 * @return bool
 	 */
@@ -929,14 +929,14 @@ abstract class Object {
 	}
 	
 	/**
-	 * @return string this classes parent class
+	 * @return string This class' parent class
 	 */
 	public function parentClass() {
 		return get_parent_class($this);
 	}
 	
 	/**
-	 * Check if this class is an instance of a specific class, or has that class as one of its parents
+	 * Check if this class is an instance of a specific class, or has that class as one of its parents.
 	 *
 	 * @param string $class
 	 * @return bool
@@ -946,22 +946,21 @@ abstract class Object {
 	}
 	
 	/**
-	 * @return string the class name
+	 * @return string The class name
 	 */
 	public function __toString() {
 		return $this->class;
 	}
 	
-	// --------------------------------------------------------------------------------------------------------------
-	
 	/**
-	 * Calls a method if available on both this object and all applied {@link Extensions}, and then attempts to merge
-	 * all results into an array
+	 * Calls a method if available on this object and all applied {@link Extensions}, and then attempts to merge all
+	 * results into an array.
 	 *
-	 * @param string $method the method name to call
-	 * @param mixed $argument a single argument to pass
+	 * @todo Integrate inheritance rules
+	 *
+	 * @param string $method The method name to call
+	 * @param mixed $argument A single argument to pass
 	 * @return mixed
-	 * @todo integrate inheritance rules
 	 */
 	public function invokeWithExtensions($method, $argument = null) {
 		$result = method_exists($this, $method) ? array($this->$method($argument)) : array();
@@ -969,20 +968,20 @@ abstract class Object {
 		
 		return $extras ? array_merge($result, $extras) : $result;
 	}
-	
+
 	/**
 	 * Run the given function on all of this object's extensions. Note that this method originally returned void, so if
-	 * you wanted to return results, you're hosed
+	 * you wanted to return results, you were hosed.
 	 *
-	 * Currently returns an array, with an index resulting every time the function is called. Only adds returns if
-	 * they're not NULL, to avoid bogus results from methods just defined on the parent extension. This is important for
-	 * permission-checks through extend, as they use min() to determine if any of the returns is FALSE. As min() doesn't
-	 * do type checking, an included NULL return would fail the permission checks.
-	 * 
+	 * Now this returns an array, with an index resulting every time the function is called. Only adds returns if
+	 * they're not null, to avoid bogus results from methods just defined on the parent extension. This is important for
+	 * permission-checks through extend, as they use min() to determine if any of the returns is false. As min() doesn't
+	 * do type checking, an included null return would fail the permission checks.
+	 *
 	 * The extension methods are defined during {@link __construct()} in {@link defineMethods()}.
-	 * 
-	 * @param string $method the name of the method to call on each extension
-	 * @param mixed $a1,... up to 7 arguments to be passed to the method
+	 *
+	 * @param string $method The name of the method to call on each extension
+	 * @param mixed  $a1,... Up to 7 arguments to be passed to the method
 	 * @return array
 	 */
 	public function extend($method, &$a1=null, &$a2=null, &$a3=null, &$a4=null, &$a5=null, &$a6=null, &$a7=null) {
@@ -1021,25 +1020,23 @@ abstract class Object {
 	 * 
 	 * @uses hasExtension()
 	 *
-	 * @param string $extension
+	 * @param string $extension The ClassName of the extension you want to retrieve
 	 * @return Extension
 	 */
 	public function getExtensionInstance($extension) {
 		if($this->hasExtension($extension)) return $this->extension_instances[$extension];
 	}
-	
+
 	/**
-	 * Returns TRUE if this object instance has a specific extension applied
-	 * in {@link $extension_instances}. Extension instances are initialized
-	 * at constructor time, meaning if you use {@link add_extension()}
-	 * afterwards, the added extension will just be added to new instances
-	 * of the extended class. Use the static method {@link has_extension()}
-	 * to check if a class (not an instance) has a specific extension.
-	 * Caution: Don't use singleton(<class>)->hasExtension() as it will
-	 * give you inconsistent results based on when the singleton was first
-	 * accessed.
+	 * Returns true if this object instance has a specific extension applied in {@link $extension_instances}. Extension
+	 * instances are initialized at constructor time, meaning if you use {@link add_extension()} afterwards, the added
+	 * extension will just be added to new instances of the extended class. Use the static method
+	 * {@link has_extension()} to check if a class (not an instance) has a specific extension.
 	 *
-	 * @param string $extension Classname of an {@link Extension} subclass without parameters
+	 * Caution: Don't use singleton(<class>)->hasExtension() as it will give you inconsistent results based on when the
+	 * singleton was first accessed.
+	 *
+	 * @param string $extension ClassName of an {@link Extension} subclass without parameters
 	 * @return bool
 	 */
 	public function hasExtension($extension) {
@@ -1047,27 +1044,24 @@ abstract class Object {
 	}
 	
 	/**
-	 * Get all extension instances for this specific object instance.
-	 * See {@link get_extensions()} to get all applied extension classes
-	 * for this class (not the instance).
+	 * Get all extension instances for this specific object instance. See {@link get_extensions()} if you only want to
+	 * get a list of extension class names rather than their instances.
 	 * 
-	 * @return array Map of {@link DataExtension} instances, keyed by classname.
+	 * @return array Map of {@link DataExtension} instances, keyed by ClassName.
 	 */
 	public function getExtensionInstances() {
 		return $this->extension_instances;
 	}
-	
-	// --------------------------------------------------------------------------------------------------------------
-	
+
 	/**
 	 * Cache the results of an instance method in this object to a file, or if it is already cache return the cached
-	 * results
+	 * results.
 	 *
-	 * @param string $method the method name to cache
-	 * @param int $lifetime the cache lifetime in seconds
-	 * @param string $ID custom cache ID to use
-	 * @param array $arguments an optional array of arguments
-	 * @return mixed the cached data
+	 * @param string      $method    The method name to cache
+	 * @param int         $lifetime  The cache lifetime in seconds
+	 * @param string|bool $ID        Custom cache ID override
+	 * @param array       $arguments An optional array of arguments
+	 * @return mixed The cached data
 	 */
 	public function cacheToFile($method, $lifetime = 3600, $ID = false, $arguments = array()) {
 		if(!$this->hasMethod($method)) {
@@ -1090,9 +1084,13 @@ abstract class Object {
 		
 		return $data;
 	}
-	
+
 	/**
-	 * Clears the cache for the given cacheToFile call
+	 * Clears the cache for the given cacheToFile call.
+	 * @param string $method    The name of the method whose result you need to clear
+	 * @param bool   $ID        Custom cache ID override
+	 * @param array  $arguments An optional array of arguments; these should match the ones given when the function
+	 *                          result was originally cached
 	 */
 	public function clearCache($method, $ID = false, $arguments = array()) {
 		$cacheName = $this->class . '_' . $method;
@@ -1103,12 +1101,12 @@ abstract class Object {
 		$file = TEMP_FOLDER . '/' . $this->sanitiseCachename($cacheName);
 		if(file_exists($file)) unlink($file);
 	}
-	
+
 	/**
 	 * Loads a cache from the filesystem if a valid on is present and within the specified lifetime
 	 *
-	 * @param string $cache the cache name
-	 * @param int $lifetime the lifetime (in seconds) of the cache before it is invalid
+	 * @param string $cache    The cache name
+	 * @param int    $lifetime The lifetime (in seconds) of the cache before it is invalid
 	 * @return mixed
 	 */
 	protected function loadCache($cache, $lifetime = 3600) {
@@ -1120,22 +1118,22 @@ abstract class Object {
 		
 		return false;
 	}
-	
+
 	/**
 	 * Save a piece of cached data to the file system
 	 *
-	 * @param string $cache the cache name
-	 * @param mixed $data data to save (must be serializable)
+	 * @param string $cache The cache name
+	 * @param mixed  $data  Data to save (must be serializable)
 	 */
 	protected function saveCache($cache, $data) {
 		file_put_contents(TEMP_FOLDER . '/' . $this->sanitiseCachename($cache), serialize($data));
 	}
-	
+
 	/**
 	 * Strip a file name of special characters so it is suitable for use as a cache file name
 	 *
 	 * @param string $name
-	 * @return string the name with all special cahracters replaced with underscores
+	 * @return string The name with all special characters replaced with underscores
 	 */
 	protected function sanitiseCachename($name) {
 		return str_replace(array('~', '.', '/', '!', ' ', "\n", "\r", "\t", '\\', ':', '"', '\'', ';'), '_', $name);
