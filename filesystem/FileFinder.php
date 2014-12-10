@@ -16,11 +16,17 @@
  *     succesfully matched. It is passed the basename, pathname and depth.
  *   - dir_callback (callback): The same as file_callback, but called for
  *     directories.
- *   - ignore_files (array): An array of file names to skip.
- *   - ignore_dirs (array): An array of directory names to skip.
+ *   - ignore_files (array): An array of file names to skip. You can add to
+ *     this manually in your _ss_environment file using something like:
+ *        define('SS_FILEFINDER_IGNORE_FILES', 'file1.txt,file2.txt');
+ *   - ignore_dirs (array): An array of directory names to skip. You can add
+ *     to this manually in your _ss_environment file using something like:
+ *        define('SS_FILEFINDER_IGNORE_DIRS', 'node_modules,.idea');
  *   - ignore_vcs (bool): Skip over commonly used VCS dirs (svn, git, hg, bzr).
  *     This is enabled by default. The names of VCS directories to skip over
- *     are defined in {@link SS_FileFInder::$vcs_dirs}.
+ *     are defined in {@link SS_FileFInder::$vcs_dirs}, and you can add to
+ *     them in your _ss_environment file using something like:
+ *        define('SS_FILEFINDER_VCS_DIRS', '.vcs');
  *   - max_depth (int): The maxmium depth to traverse down the folder tree,
  *     default to unlimited.
  *
@@ -73,6 +79,20 @@ class SS_FileFinder {
 			$this->options = array_merge(Object::static_lookup($class, 'default_options'), $this->options);
 		}
 		while ($class = get_parent_class($class));
+
+        // We can also override these from _ss_environment.php
+        if (defined('SS_FILEFINDER_VCS_DIRS')) {
+            self::$vcs_dirs =
+                array_merge(static::$vcs_dirs, explode(',', SS_FILEFINDER_VCS_DIRS));
+        }
+        if (defined('SS_FILEFINDER_IGNORE_FILES')) {
+            $this->options['ignore_files'] =
+                array_merge($this->options['ignore_files'] ?: array(), explode(',', SS_FILEFINDER_IGNORE_FILES));
+        }
+        if (defined('SS_FILEFINDER_IGNORE_DIRS')) {
+            $this->options['ignore_dirs'] =
+                array_merge($this->options['ignore_dirs'] ?: array(), explode(',', SS_FILEFINDER_IGNORE_DIRS));
+        }
 	}
 
 	/**

@@ -45,6 +45,45 @@ class FileFinderTest extends SapphireTest {
 			'The finder only returns files matching the name regex.');
 	}
 
+    public function testVcsDirsFromEnvironment()
+    {
+        define('SS_FILEFINDER_VCS_DIRS', '.something,.somethingElse');
+        // The static is updated in the constructor
+        $finder   = new SS_FileFinder();
+        $vcs_dirs = new ReflectionProperty('SS_FileFinder', 'vcs_dirs');
+        $vcs_dirs->setAccessible(true);
+        $this->assertContains('.something', $vcs_dirs->getValue(),
+            'The finder adds folders from SS_FILEFINDER_VCS_DIRS to the vcs_dirs setting');
+        $this->assertContains('.somethingElse', $vcs_dirs->getValue(),
+            'The finder adds folders from SS_FILEFINDER_VCS_DIRS to the vcs_dirs setting');
+    }
+
+    public function testIgnoreDirsFromEnvironment()
+    {
+        define('SS_FILEFINDER_IGNORE_DIRS', 'some.dir,someOther.dir');
+        $finder = new SS_FileFinder();
+        $options = new ReflectionProperty('SS_FileFinder', 'options');
+        $options->setAccessible(true);
+        $options = $options->getValue($finder);
+        $this->assertContains('some.dir', $options['ignore_dirs'],
+            'The finder adds files from SS_FILEFINDER_IGNORE_DIRS to ignore_dirs');
+        $this->assertContains('someOther.dir', $options['ignore_dirs'],
+            'The finder adds files from SS_FILEFINDER_IGNORE_DIRS to ignore_dirs');
+    }
+
+    public function testIgnoreFilesFromEnvironment()
+    {
+        define('SS_FILEFINDER_IGNORE_FILES', 'some.file,someOther.file');
+        $finder = new SS_FileFinder();
+        $options = new ReflectionProperty('SS_FileFinder', 'options');
+        $options->setAccessible(true);
+        $options = $options->getValue($finder);
+        $this->assertContains('some.file', $options['ignore_files'],
+            'The finder adds files from SS_FILEFINDER_IGNORE_FILES to ignore_files');
+        $this->assertContains('someOther.file', $options['ignore_files'],
+            'The finder adds files from SS_FILEFINDER_IGNORE_FILES to ignore_files');
+    }
+
 	public function testIgnoreFiles() {
 		$finder = new SS_FileFinder();
 		$finder->setOption('ignore_files', array('file1.txt', 'dir1file1.txt', 'dir2file1.txt'));

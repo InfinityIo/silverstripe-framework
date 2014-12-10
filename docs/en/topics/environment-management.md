@@ -123,3 +123,6 @@ This is my `_ss_environment.php` file. I have it placed in `/var`, as each of th
 | `SS_SEND_ALL_EMAILS_TO`| If you set this define, all emails will be redirected to this address.|
 | `SS_SEND_ALL_EMAILS_FROM`| If you set this define, all emails will be send from this address.|
 | `SS_ERROR_LOG` | |
+| `SS_FILEFINDER_VCS_DIRS` | Add VCS directories to ignore to `SS_FileFinder::$vcs_dirs`; separate multiple with commas |
+| `SS_FILEFINDER_IGNORE_DIRS` | Add directories to ignore to `SS_FileFinder#$options['ignore_dirs']`; separate multiple with commas |
+| `SS_FILEFINDER_IGNORE_FILES` | Add directories to ignore to `SS_FileFinder#$options['ignore_files']`; separate multiple with commas |
